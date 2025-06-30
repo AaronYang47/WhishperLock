@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhishperLock - Secure Messaging App</title>
+    <style>
+        :root {
+            --primary-color: #0A2647;
+            --secondary-color: #144272;
+            --accent-color-1: #205295;
+            --accent-color-2: #2C74B3;
+            --text-color: #E5E5E5;
+            --background-color: #040D12;
+            --modal-overlay: rgba(4, 13, 18, 0.95);
+            --gradient-1: linear-gradient(135deg, #0A2647, #144272);
+            --gradient-2: linear-gradient(135deg, #144272, #205295);
+            --gradient-3: linear-gradient(135deg, #205295, #2C74B3);
+            --card-bg: rgba(10, 38, 71, 0.2);
+            --glass-effect: rgba(255, 255, 255, 0.03);
+        }
+
+        @keyframes cryptoFloat {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-5px) translateX(2px); }
+            50% { transform: translateY(0) translateX(4px); }
+            75% { transform: translateY(5px) translateX(2px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 20px rgba(44, 116, 179, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(44, 116, 179, 0.2); }
+            100% { box-shadow: 0 0 20px rgba(44, 116, 179, 0.1); }
+        }
+
+        @keyframes fadeInCrypto {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+                filter: blur(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(44, 116, 179, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(20, 66, 114, 0.05) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeInCrypto 1.5s ease forwards;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-effect);
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            animation: glowPulse 4s ease-in-out infinite;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, var(--glass-effect), transparent);
+            transform: translateX(-100%);
+            transition: transform 1s ease;
+        }
+
+        .hero:hover::before {
+            transform: translateX(100%);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-shadow: 0 0 10px rgba(44, 116, 179, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(229, 229, 229, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+            letter-spacing: 1px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 50px 0;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-effect);
+            border-radius: 8px;
+            padding: 30px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            animation: fadeInCrypto 0.5s ease-out forwards;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(10, 38, 71, 0.3);
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            letter-spacing: 1px;
+        }
+
+        .feature-card p {
+            color: rgba(229, 229, 229, 0.7);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .feature-card .learn-more {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--accent-color-2);
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .feature-card:hover .learn-more {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .privacy {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-effect);
+            border-radius: 8px;
+            padding: 40px;
+            margin: 50px 0;
+            position: relative;
+        }
+
+        .privacy h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            letter-spacing: 1px;
+        }
+
+        .privacy ul {
+            list-style: none;
+        }
+
+        .privacy ul li {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+            color: rgba(229, 229, 229, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .privacy ul li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color-2);
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .privacy ul li:hover {
+            color: var(--text-color);
+            transform: translateX(5px);
+        }
+
+        .contact {
+            text-align: center;
+            padding: 50px 0;
+        }
+
+        .contact a {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--gradient-1);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-effect);
+        }
+
+        .contact a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 116, 179, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-effect);
+            margin: 50px auto;
+            padding: 40px;
+            max-width: 800px;
+            border-radius: 8px;
+            position: relative;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .modal-section {
+            margin-bottom: 30px;
+            animation: fadeInCrypto 0.5s ease-out both;
+        }
+
+        .modal-section h3 {
+            color: var(--accent-color-2);
+            margin-bottom: 15px;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .modal-section p {
+            color: rgba(229, 229, 229, 0.7);
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .tech-details {
+            background: rgba(10, 38, 71, 0.3);
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 2px solid var(--accent-color-2);
+        }
+
+        .tech-details h4 {
+            color: var(--accent-color-2);
+            margin-bottom: 15px;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(229, 229, 229, 0.5);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .feature-card {
+                margin: 10px;
+            }
+
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="hero">
+            <h1>WhishperLock</h1>
+            <p>A secure and private instant messaging app with end-to-end encryption for every message</p>
+        </section>
+
+        <section class="features">
+            <div class="feature-card" onclick="openModal('encryption')">
+                <h3>End-to-End Encryption</h3>
+                <p>Utilizing military-grade AES-256-GCM encryption to ensure your messages can only be viewed by intended recipients.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+
+            <div class="feature-card" onclick="openModal('biometric')">
+                <h3>Biometric Protection</h3>
+                <p>Integrated Face ID/Touch ID biometric verification ensures only you can view decrypted messages.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+
+            <div class="feature-card" onclick="openModal('self-destruct')">
+                <h3>Self-Destructing Messages</h3>
+                <p>Set messages to automatically delete after a specified time. Perfect for sharing sensitive information.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+
+            <div class="feature-card" onclick="openModal('friends')">
+                <h3>Friend System</h3>
+                <p>Simple and intuitive friend management system with encrypted social interactions.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+
+            <div class="feature-card" onclick="openModal('notifications')">
+                <h3>Real-time Notifications</h3>
+                <p>Receive instant notifications with privacy-focused content processing.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+
+            <div class="feature-card" onclick="openModal('offline')">
+                <h3>Offline Support</h3>
+                <p>Access historical messages even when offline while maintaining data encryption.</p>
+                <span class="learn-more">Learn More →</span>
+            </div>
+        </section>
+
+        <section class="privacy">
+            <h2>Privacy Statement</h2>
+            <p>At WhishperLock, your privacy and security are our top priorities:</p>
+            <ul style="margin-top: 20px; margin-left: 20px;">
+                <li>All messages are end-to-end encrypted using AES-256-GCM algorithm</li>
+                <li>Biometric data is used locally on your device only, never uploaded to servers</li>
+                <li>Chat history is stored locally on your device and remains encrypted</li>
+                <li>No user location data is collected</li>
+                <li>Your data is never shared with third parties</li>
+                <li>Support for account deletion and removal of all associated data</li>
+                <li>Notification content is specially processed for privacy</li>
+                <li>Regular security audits and updates</li>
+            </ul>
+        </section>
+
+        <section class="contact">
+            <h2 style="margin-bottom: 30px;">Contact Us</h2>
+            <p style="margin-bottom: 20px;">If you have any questions, suggestions, or need support, please don't hesitate to reach out:</p>
+            <a href="mailto:aaronyang470128@hotmail.com">Send Email</a>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 WhishperLock. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Modal Templates -->
+    <div id="modal-encryption" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('encryption')">&times;</span>
+            <h2>End-to-End Encryption</h2>
+            
+            <div class="modal-section">
+                <h3>How It Works</h3>
+                <p>WhishperLock uses state-of-the-art encryption technology to ensure your messages remain private and secure:</p>
+                <ul>
+                    <li>Messages are encrypted on your device before being sent</li>
+                    <li>Only the intended recipient can decrypt and read the messages</li>
+                    <li>Each chat room has its own unique encryption keys</li>
+                    <li>Messages remain encrypted during transit and storage</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Key Features</h3>
+                <ul>
+                    <li>AES-256-GCM military-grade encryption</li>
+                    <li>Perfect Forward Secrecy (PFS) support</li>
+                    <li>Automatic key rotation</li>
+                    <li>Secure key management</li>
+                    <li>Message integrity verification</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Technical Specifications</h4>
+                <ul>
+                    <li>Encryption Algorithm: AES-256-GCM</li>
+                    <li>Key Exchange: ECDH with Curve25519</li>
+                    <li>Message Authentication: HMAC-SHA256</li>
+                    <li>Key Derivation: HKDF-SHA256</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-biometric" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('biometric')">&times;</span>
+            <h2>Biometric Protection</h2>
+            
+            <div class="modal-section">
+                <h3>Enhanced Security</h3>
+                <p>WhishperLock leverages your device's built-in biometric authentication to add an extra layer of security:</p>
+                <ul>
+                    <li>Face ID on supported iOS devices</li>
+                    <li>Touch ID on devices with fingerprint sensors</li>
+                    <li>Fallback to device passcode when needed</li>
+                    <li>Local authentication only - no biometric data leaves your device</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>When It's Used</h3>
+                <ul>
+                    <li>Viewing decrypted messages</li>
+                    <li>Accessing sensitive app settings</li>
+                    <li>Importing/exporting encryption keys</li>
+                    <li>Changing security settings</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Security Features</h4>
+                <ul>
+                    <li>Local Authentication Framework integration</li>
+                    <li>Automatic security level adaptation</li>
+                    <li>Configurable authentication timeout</li>
+                    <li>Biometric data never leaves Secure Enclave</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-self-destruct" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('self-destruct')">&times;</span>
+            <h2>Self-Destructing Messages</h2>
+            
+            <div class="modal-section">
+                <h3>How It Works</h3>
+                <p>Send messages that automatically delete themselves after a specified time:</p>
+                <ul>
+                    <li>Set custom expiration times from 1 minute to 7 days</li>
+                    <li>Messages are permanently deleted from all devices</li>
+                    <li>Countdown timer visible to all participants</li>
+                    <li>Option to manually trigger deletion</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Sharing sensitive information temporarily</li>
+                    <li>Time-sensitive communications</li>
+                    <li>Maintaining conversation privacy</li>
+                    <li>Automatic cleanup of outdated information</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Technical Implementation</h4>
+                <ul>
+                    <li>Secure time synchronization</li>
+                    <li>Distributed deletion verification</li>
+                    <li>Backup prevention mechanisms</li>
+                    <li>Secure deletion protocols</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-friends" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('friends')">&times;</span>
+            <h2>Friend System</h2>
+            
+            <div class="modal-section">
+                <h3>Features</h3>
+                <p>A comprehensive friend management system with privacy at its core:</p>
+                <ul>
+                    <li>Secure friend discovery</li>
+                    <li>Encrypted friend requests</li>
+                    <li>Privacy-focused profile sharing</li>
+                    <li>Granular privacy controls</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Privacy Controls</h3>
+                <ul>
+                    <li>Control who can send you friend requests</li>
+                    <li>Manage visibility of your online status</li>
+                    <li>Set custom privacy rules for each friend</li>
+                    <li>Block and unblock users easily</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Security Measures</h4>
+                <ul>
+                    <li>Encrypted friend relationships</li>
+                    <li>Secure contact discovery</li>
+                    <li>Privacy-preserving presence updates</li>
+                    <li>Encrypted profile data</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-notifications" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('notifications')">&times;</span>
+            <h2>Real-time Notifications</h2>
+            
+            <div class="modal-section">
+                <h3>Smart Notifications</h3>
+                <p>Stay updated while maintaining privacy:</p>
+                <ul>
+                    <li>Instant message notifications</li>
+                    <li>Friend request alerts</li>
+                    <li>Privacy-focused notification content</li>
+                    <li>Customizable notification settings</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Privacy Features</h3>
+                <ul>
+                    <li>Hidden message content in notifications</li>
+                    <li>Customizable preview settings</li>
+                    <li>Sensitive content protection</li>
+                    <li>Background refresh controls</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Technical Features</h4>
+                <ul>
+                    <li>Push notification encryption</li>
+                    <li>Silent notifications support</li>
+                    <li>Battery-efficient implementation</li>
+                    <li>Reliable delivery system</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-offline" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('offline')">&times;</span>
+            <h2>Offline Support</h2>
+            
+            <div class="modal-section">
+                <h3>Key Features</h3>
+                <p>Access your messages anytime, even without internet connection:</p>
+                <ul>
+                    <li>Offline message access</li>
+                    <li>Automatic message syncing</li>
+                    <li>Encrypted local storage</li>
+                    <li>Bandwidth-efficient updates</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Messages are cached locally in encrypted form</li>
+                    <li>Automatic background syncing when online</li>
+                    <li>Smart sync scheduling to save battery</li>
+                    <li>Conflict resolution for offline changes</li>
+                </ul>
+            </div>
+
+            <div class="tech-details">
+                <h4>Technical Implementation</h4>
+                <ul>
+                    <li>Secure local database encryption</li>
+                    <li>Efficient sync protocols</li>
+                    <li>Delta updates for bandwidth saving</li>
+                    <li>Automatic conflict resolution</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            const modal = document.getElementById(`modal-${id}`);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(`modal-${id}`);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 500);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                const modal = event.target;
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 500);
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('active');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 500);
+                });
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.feature-card, .privacy, .contact').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html> 
