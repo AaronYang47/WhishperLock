@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhishperLock — Zero-Knowledge Encrypted Communication</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a10;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-highlight: rgba(255, 255, 255, 0.08);
+            --text-primary: #f0f0f5;
+            --text-secondary: rgba(240, 240, 245, 0.5);
+            --text-muted: rgba(240, 240, 245, 0.3);
+            --accent-cyan: #00d4ff;
+            --accent-purple: #a855f7;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow-1 {
+            top: -200px;
+            right: -100px;
+            background: var(--accent-cyan);
+        }
+
+        .bg-glow-2 {
+            bottom: -200px;
+            left: -200px;
+            background: var(--accent-purple);
+        }
+
+        .bg-glow-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-blue);
+            opacity: 0.06;
+            width: 800px;
+            height: 800px;
+        }
+
+        /* Glass Card */
+        .glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            backdrop-filter: blur(60px);
+            -webkit-backdrop-filter: blur(60px);
+        }
+
+        .glass-inner {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 40px;
+            background: rgba(5, 5, 8, 0.8);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        nav .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Sections */
+        section {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px 6px 8px;
+            border-radius: 100px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            font-size: 13px;
+            color: var(--accent-green);
+            font-weight: 500;
+            margin-bottom: 32px;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 7vw, 88px);
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .hero-features {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 64px;
+        }
+
+        .hero-feature-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .hero-feature-tag svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Architecture Flow */
+        .flow-section {
+            padding-top: 120px;
+            padding-bottom: 80px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+        }
+
+        .section-label::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1px;
+            background: var(--accent-cyan);
+        }
+
+        .section-title {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin-bottom: 64px;
+            font-weight: 300;
+        }
+
+        /* Message Encryption Flow */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 24px;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .flow-step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .flow-step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .flow-step-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Encryption Detail Cards */
+        .enc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 120px;
+        }
+
+        .enc-card {
+            padding: 32px;
+        }
+
+        .enc-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .enc-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .enc-card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .enc-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .enc-card .tech-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 16px;
+            margin-right: 6px;
+        }
+
+        /* Audio Pipeline */
+        .pipeline-section {
+            padding-bottom: 120px;
+        }
+
+        .pipeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-width: 700px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 28px;
+            position: relative;
+        }
+
+        .pipeline-step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            flex-shrink: 0;
+        }
+
+        .pipeline-step-content {
+            flex: 1;
+        }
+
+        .pipeline-step-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .pipeline-step-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pipeline-connector {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(0,212,255,0.15), rgba(0,212,255,0.03));
+            margin-left: 46px;
+        }
+
+        /* Key Exchange */
+        .key-section {
+            padding-bottom: 120px;
+        }
+
+        .key-card {
+            padding: 40px;
+            max-width: 800px;
+        }
+
+        .key-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .key-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .key-user {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 28px;
+        }
+
+        .key-user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .key-user-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .key-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-derivation {
+            padding: 16px 24px;
+            text-align: center;
+        }
+
+        .key-derivation-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            margin-top: 8px;
+        }
+
+        .key-derivation-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* No Data Policy */
+        .no-data-section {
+            padding-bottom: 120px;
+        }
+
+        .no-data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .no-data-card {
+            padding: 28px;
+            text-align: center;
+        }
+
+        .no-data-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .no-data-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .no-data-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .no-data-card .strike {
+            text-decoration: line-through;
+            color: var(--accent-red);
+            opacity: 0.6;
+        }
+
+        /* Spec Table */
+        .spec-section {
+            padding-bottom: 120px;
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+        }
+
+        .spec-table th {
+            text-align: left;
+            padding: 14px 24px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .spec-table td {
+            padding: 16px 24px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .spec-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .spec-table td:last-child {
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .spec-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .spec-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        footer .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        footer .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        footer .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 12px 20px; }
+            .nav-links { display: none; }
+            section { padding: 0 20px; }
+            .hero h1 { letter-spacing: -1.5px; }
+            .hero .subtitle { font-size: 16px; }
+            .enc-grid { grid-template-columns: 1fr; }
+            .no-data-grid { grid-template-columns: 1fr; }
+            .flow-diagram { gap: 8px; }
+            .flow-step { padding: 14px 16px; min-width: 100px; }
+            .key-visual { flex-direction: column; }
+            .spec-table { font-size: 12px; }
+            .spec-table th, .spec-table td { padding: 10px 14px; }
+        }
+
+        /* Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-inner">
+        <a href="#" class="logo">
+            <div class="logo-icon">&#x1F512;</div>
+            <span class="logo-text">WhishperLock</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#encryption">Encryption</a></li>
+            <li><a href="#audio">Voice Calls</a></li>
+            <li><a href="#keys">Key Management</a></li>
+            <li><a href="#privacy">Privacy</a></li>
+            <li><a href="#specs">Specs</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="fade-up">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Open Source &middot; Fully Encrypted
+        </div>
+
+        <h1>
+            Speak Freely.<br>
+            <span class="gradient">Leave No Trace.</span>
+        </h1>
+
+        <p class="subtitle">
+            WhishperLock is a zero-knowledge encrypted messaging and voice calling app. 
+            Your messages and calls are encrypted on your device before they leave. 
+            The server never sees plaintext. Ever.
+        </p>
+
+        <div class="hero-features">
+            <div class="hero-feature-tag glass-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                AES-256-GCM
+            </div>
+            <div class="hero-feature-tag glass-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+                Encrypted Voice
+            </div>
+            <div class="hero-feature-tag glass-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Self-Destruct
+            </div>
+            <div class="hero-feature-tag glass-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Zero-Knowledge Server
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Message Encryption -->
+<section id="encryption" class="flow-section">
+    <div class="fade-up">
+        <div class="section-label">Message Encryption</div>
+        <h2 class="section-title">How your messages are protected</h2>
+        <p class="section-desc">
+            Every message is encrypted with AES-256-GCM on your device before transmission. 
+            The server only stores and forwards ciphertext. Only you and the recipient can decrypt.
+        </p>
+    </div>
+
+    <!-- Message Flow Diagram -->
+    <div class="flow-diagram fade-up glass" style="padding: 32px;">
+        <div class="flow-step">
+            <div class="flow-step-icon" style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.15);">
+                &#x270D;&#xFE0F;
+            </div>
+            <div class="flow-step-label">Plaintext</div>
+            <div class="flow-step-sub">UTF-8 encoded</div>
+        </div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-step">
+            <div class="flow-step-icon" style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.15);">
+                &#x1F511;
+            </div>
+            <div class="flow-step-label">AES-256-GCM</div>
+            <div class="flow-step-sub">Encrypt + authenticate</div>
+        </div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-step">
+            <div class="flow-step-icon" style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.15);">
+                &#x1F4E6;
+            </div>
+            <div class="flow-step-label">Nonce + Ciphertext</div>
+            <div class="flow-step-sub">Combined binary</div>
+        </div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-step">
+            <div class="flow-step-icon" style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.15);">
+                &#x1F4DD;
+            </div>
+            <div class="flow-step-label">Base64</div>
+            <div class="flow-step-sub">Text-safe encoding</div>
+        </div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-step">
+            <div class="flow-step-icon" style="background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.15);">
+                &#x1F310;
+            </div>
+            <div class="flow-step-label">Server</div>
+            <div class="flow-step-sub">Stores ciphertext only</div>
+        </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="enc-grid fade-up">
+        <div class="enc-card glass">
+            <div class="enc-card-header">
+                <div class="enc-card-icon" style="background: rgba(0,212,255,0.08);">
+                    &#x1F512;
+                </div>
+                <div class="enc-card-title">AES-256-GCM Encryption</div>
+            </div>
+            <p>
+                Messages are encrypted using the AES-256-GCM authenticated encryption algorithm via Apple's 
+                CryptoKit framework. This provides both confidentiality (nobody can read the message) 
+                and authenticity (any tampering is detected).
+            </p>
+            <div>
+                <span class="tech-tag" style="background: rgba(0,212,255,0.08); color: var(--accent-cyan);">AES-256-GCM</span>
+                <span class="tech-tag" style="background: rgba(168,85,247,0.08); color: var(--accent-purple);">CryptoKit</span>
+                <span class="tech-tag" style="background: rgba(59,130,246,0.08); color: var(--accent-blue);">256-bit key</span>
+            </div>
+        </div>
+
+        <div class="enc-card glass">
+            <div class="enc-card-header">
+                <div class="enc-card-icon" style="background: rgba(168,85,247,0.08);">
+                    &#x23F1;&#xFE0F;
+                </div>
+                <div class="enc-card-title">Self-Destruct Messages</div>
+            </div>
+            <p>
+                Optional self-destructing messages are encrypted with the same AES-256-GCM pipeline, 
+                wrapped in a time-limited payload. Once the timer expires, the message is permanently 
+                removed from the device. The server never stores the decrypted content.
+            </p>
+            <div>
+                <span class="tech-tag" style="background: rgba(239,68,68,0.08); color: var(--accent-red);">Time-Limited</span>
+                <span class="tech-tag" style="background: rgba(34,197,94,0.08); color: var(--accent-green);">Client-Side</span>
+            </div>
+        </div>
+
+        <div class="enc-card glass">
+            <div class="enc-card-header">
+                <div class="enc-card-icon" style="background: rgba(34,197,94,0.08);">
+                    &#x1F6E1;&#xFE0F;
+                </div>
+                <div class="enc-card-title">Authenticated Encryption</div>
+            </div>
+            <p>
+                GCM mode provides built-in authentication tags. Every message includes a cryptographic 
+                signature that verifies the ciphertext has not been modified in transit. Any alteration 
+                &mdash; even a single bit &mdash; causes decryption to fail immediately.
+            </p>
+            <div>
+                <span class="tech-tag" style="background: rgba(245,158,11,0.08); color: var(--accent-amber);">GCM Auth Tag</span>
+                <span class="tech-tag" style="background: rgba(0,212,255,0.08); color: var(--accent-cyan);">Tamper-Proof</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Voice Call Encryption -->
+<section id="audio" class="pipeline-section">
+    <div class="fade-up">
+        <div class="section-label">Encrypted Voice Calls</div>
+        <h2 class="section-title">Real-time encrypted audio pipeline</h2>
+        <p class="section-desc">
+            Voice calls use the same AES-256-GCM encryption, applied to every audio packet in real-time. 
+            The server only forwards encrypted binary blobs &mdash; it cannot decode or record your voice.
+        </p>
+    </div>
+
+    <div class="pipeline-steps fade-up">
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">1</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">Microphone Capture</div>
+                <div class="pipeline-step-desc">AVAudioEngine &middot; Float32 &middot; Native sample rate (48kHz)</div>
+            </div>
+        </div>
+        <div class="pipeline-connector"></div>
+
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">2</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">Downsample to 16kHz</div>
+                <div class="pipeline-step-desc">Linear interpolation &middot; 48kHz &rarr; 16kHz &middot; ~640 samples/packet</div>
+            </div>
+        </div>
+        <div class="pipeline-connector"></div>
+
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">3</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">Float32 &rarr; Int16 Conversion</div>
+                <div class="pipeline-step-desc">PCM quantization &middot; [-1.0, 1.0] &rarr; [-32767, 32767]</div>
+            </div>
+        </div>
+        <div class="pipeline-connector"></div>
+
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">4</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">AES-256-GCM Encryption</div>
+                <div class="pipeline-step-desc">Unique nonce per packet &middot; Room-specific symmetric key</div>
+            </div>
+        </div>
+        <div class="pipeline-connector"></div>
+
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">5</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">Base64 Encoding</div>
+                <div class="pipeline-step-desc">Nonce + Ciphertext + Auth Tag &rarr; Base64 string</div>
+            </div>
+        </div>
+        <div class="pipeline-connector"></div>
+
+        <div class="pipeline-step glass">
+            <div class="pipeline-step-num">6</div>
+            <div class="pipeline-step-content">
+                <div class="pipeline-step-title">WebSocket Transmission</div>
+                <div class="pipeline-step-desc">JSON payload &middot; ~25 packets/sec &middot; Encrypted end-to-end</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Management -->
+<section id="keys" class="key-section">
+    <div class="fade-up">
+        <div class="section-label">Key Management</div>
+        <h2 class="section-title">Deterministic room-based key derivation</h2>
+        <p class="section-desc">
+            Each chat room has a unique 256-bit encryption key derived from the room ID. 
+            Both participants derive the same key independently &mdash; no key exchange over the network.
+        </p>
+    </div>
+
+    <div class="key-card glass fade-up">
+        <h3>Key Derivation Process</h3>
+        <div class="key-visual">
+            <div class="key-user glass-strong">
+                <div class="key-user-avatar">&#x1F464;</div>
+                <div class="key-user-label">User A</div>
+            </div>
+
+            <div class="key-center">
+                <div style="font-size: 20px; color: var(--text-muted);">&#x2194;</div>
+                <div class="key-derivation glass-inner">
+                    <div class="key-derivation-code">SHA-256(roomId)</div>
+                    <div class="key-derivation-label">Deterministic derivation</div>
+                </div>
+                <div style="font-size: 20px; color: var(--text-muted);">&#x2194;</div>
+            </div>
+
+            <div class="key-user glass-strong">
+                <div class="key-user-avatar">&#x1F464;</div>
+                <div class="key-user-label">User B</div>
+            </div>
+        </div>
+
+        <div class="glass-inner" style="padding: 20px 24px;">
+            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                <p style="margin-bottom: 12px;">
+                    Both users independently compute the same symmetric key using:
+                </p>
+                <ol style="padding-left: 20px; margin-bottom: 12px;">
+                    <li>The room ID is converted to UTF-8 bytes</li>
+                    <li>SHA-256 hash produces a 256-bit digest</li>
+                    <li>The hash becomes the AES-256 symmetric key</li>
+                    <li>Key is stored in the iOS Keychain (<code style="color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 12px;">kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code>)</li>
+                </ol>
+                <p>
+                    No key is ever transmitted over the network. Both parties derive identical keys 
+                    from the shared room identifier, ensuring seamless end-to-end encryption without 
+                    any key exchange protocol.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Privacy / No Data -->
+<section id="privacy" class="no-data-section">
+    <div class="fade-up">
+        <div class="section-label">Zero Data Policy</div>
+        <h2 class="section-title">What the server never sees</h2>
+        <p class="section-desc">
+            WhishperLock's server acts as a blind relay. It stores and forwards encrypted payloads 
+            without any ability to decrypt them. Call data is not stored at all.
+        </p>
+    </div>
+
+    <div class="no-data-grid fade-up">
+        <div class="no-data-card glass">
+            <div class="no-data-icon">&#x1F4AC;</div>
+            <h4>Message Content</h4>
+            <p>
+                The database stores only Base64-encoded ciphertext. The server has no access to 
+                the encryption key and <span class="strike">cannot read</span> your messages.
+            </p>
+        </div>
+
+        <div class="no-data-card glass">
+            <div class="no-data-icon">&#x1F50A;</div>
+            <h4>Voice Call Audio</h4>
+            <p>
+                Call audio is never stored in any database. Packets are forwarded in real-time 
+                and discarded immediately. <span class="strike">No recordings.</span> No logs.
+            </p>
+        </div>
+
+        <div class="no-data-card glass">
+            <div class="no-data-icon">&#x1F510;</div>
+            <h4>Encryption Keys</h4>
+            <p>
+                Keys are derived on-device and stored exclusively in the iOS Keychain. 
+                The server <span class="strike">never receives</span> or stores any encryption key material.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Technical Specs -->
+<section id="specs" class="spec-section">
+    <div class="fade-up">
+        <div class="section-label">Technical Specifications</div>
+        <h2 class="section-title">Encryption details at a glance</h2>
+    </div>
+
+    <div class="glass fade-up" style="overflow: hidden; margin-bottom: 120px;">
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Message Cipher</td>
+                    <td><span class="spec-badge" style="background: rgba(0,212,255,0.08); color: var(--accent-cyan);">AES-256-GCM</span></td>
+                </tr>
+                <tr>
+                    <td>Voice Cipher</td>
+                    <td><span class="spec-badge" style="background: rgba(0,212,255,0.08); color: var(--accent-cyan);">AES-256-GCM</span></td>
+                </tr>
+                <tr>
+                    <td>Key Size</td>
+                    <td>256 bits</td>
+                </tr>
+                <tr>
+                    <td>Key Derivation</td>
+                    <td>SHA-256(roomId) &rarr; SymmetricKey</td>
+                </tr>
+                <tr>
+                    <td>Key Storage</td>
+                    <td>iOS Keychain &middot; ThisDeviceOnly</td>
+                </tr>
+                <tr>
+                    <td>Nonce</td>
+                    <td>Random 96-bit per encryption</td>
+                </tr>
+                <tr>
+                    <td>Auth Tag</td>
+                    <td>128-bit GCM authentication tag</td>
+                </tr>
+                <tr>
+                    <td>Audio Sample Rate</td>
+                    <td>16,000 Hz (downsampled from 48kHz)</td>
+                </tr>
+                <tr>
+                    <td>Audio Format</td>
+                    <td>16-bit PCM &middot; Mono &middot; 16kHz</td>
+                </tr>
+                <tr>
+                    <td>Packet Rate</td>
+                    <td>~25 packets/sec (40ms interval)</td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td>WSS (WebSocket Secure) &middot; TLS 1.3</td>
+                </tr>
+                <tr>
+                    <td>Backend</td>
+                    <td>Cloudflare Workers &middot; D1 &middot; Durable Objects</td>
+                </tr>
+                <tr>
+                    <td>Client</td>
+                    <td>SwiftUI &middot; iOS 16+ &middot; CryptoKit</td>
+                </tr>
+                <tr>
+                    <td>Call Audio Storage</td>
+                    <td><span class="spec-badge" style="background: rgba(239,68,68,0.08); color: var(--accent-red);">NONE</span> &middot; Real-time relay only</td>
+                </tr>
+                <tr>
+                    <td>Call Records</td>
+                    <td><span class="spec-badge" style="background: rgba(239,68,68,0.08); color: var(--accent-red);">NONE</span> &middot; No call logs stored</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-links">
+        <a href="#">GitHub</a>
+        <a href="#encryption">Encryption</a>
+        <a href="#audio">Voice Calls</a>
+        <a href="#privacy">Privacy</a>
+    </div>
+    <p>&copy; 2025 WhishperLock. Open source under MIT License.</p>
+    <p style="margin-top: 8px; font-size: 11px;">Built with SwiftUI, CryptoKit, and Cloudflare Workers.</p>
+</footer>
+
+<script>
+    // Intersection Observer for fade-up animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
