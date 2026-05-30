@@ -110,15 +110,6 @@ nav {
     display: block;
 }
 
-.hero-logo {
-    width: clamp(120px, 22vw, 180px);
-    height: auto;
-    margin: 0 auto 28px;
-    display: block;
-    object-fit: contain;
-    filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.35));
-}
-
 .nav-links {
     display: flex;
     flex-wrap: wrap;
