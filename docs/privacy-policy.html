@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — WhishperLock</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<nav>
+    <div class="nav-inner">
+        <a href="index.html" class="logo"><span class="logo-icon">🔒</span> WhishperLock</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#guide">User Guide</a></li>
+            <li><a href="support.html">Support</a></li>
+            <li><a href="privacy-policy.html" class="active">Privacy</a></li>
+            <li><a href="terms-of-service.html">Terms</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="page-wrap">
+    <article class="glass legal-content">
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: May 30, 2026</p>
+
+        <p>WhishperLock (“we,” “our,” or “the App”) is a secure messaging application developed by Aaron Yang. This Privacy Policy explains how we collect, use, store, and protect information when you use the iOS app and related services.</p>
+
+        <h2>1. Summary</h2>
+        <p>WhishperLock is designed for end-to-end encrypted private messaging, encrypted voice calls, and encrypted attachments. Message content, file payloads, and location shares are encrypted on your device before transmission. Our servers store and relay ciphertext without the ability to decrypt your conversations.</p>
+
+        <h2>2. Information We Collect</h2>
+
+        <h3>2.1 Account information</h3>
+        <ul>
+            <li><strong>Registration:</strong> Username, email address, and password (passwords are hashed on the server; we do not store plaintext passwords).</li>
+            <li><strong>Sign in with Apple:</strong> If you use Apple Sign-In, we receive the identifiers and account information Apple provides according to your Apple ID settings.</li>
+            <li><strong>Profile:</strong> Display name and profile details you choose to provide.</li>
+        </ul>
+
+        <h3>2.2 Messages and chat data</h3>
+        <ul>
+            <li>Chat messages are encrypted on your device using AES-256-GCM with room-specific keys derived on-device.</li>
+            <li>Our backend stores encrypted message payloads (ciphertext) to enable delivery and history sync. We cannot read decrypted message content.</li>
+            <li>Self-destruct message metadata (timers, read state) may be stored to support disappearing messages.</li>
+        </ul>
+
+        <h3>2.3 Encrypted attachments and location</h3>
+        <ul>
+            <li>Files and images you send are encrypted on-device before upload. Encrypted blobs may be stored in cloud object storage; decryption keys are not sent to the server.</li>
+            <li>Location shares are encrypted inside the message payload. We do not use your location for advertising or unrelated analytics.</li>
+        </ul>
+
+        <h3>2.4 Voice calls</h3>
+        <ul>
+            <li>Voice call audio is encrypted on-device and transmitted in real time over WebSocket signaling.</li>
+            <li>Call audio is <strong>not recorded or stored</strong> on our servers. Packets are forwarded and discarded.</li>
+            <li>VoIP push tokens are used only to wake the app for incoming calls via Apple PushKit and CallKit.</li>
+        </ul>
+
+        <h3>2.5 Device and technical data</h3>
+        <ul>
+            <li><strong>APNs device token</strong> — for message and friend-request notifications.</li>
+            <li><strong>VoIP push token</strong> — for incoming call notifications when the app is not active.</li>
+            <li><strong>Connection metadata</strong> — such as online presence, room membership, and timestamps needed to operate chat and calls.</li>
+            <li><strong>Authentication tokens</strong> — session tokens stored securely in the iOS Keychain on your device.</li>
+        </ul>
+
+        <h3>2.6 Data stored only on your device</h3>
+        <ul>
+            <li>Encryption keys derived for chat rooms (iOS Keychain).</li>
+            <li>Biometric authentication (Face ID / Touch ID / Optic ID) is processed by iOS; we do not receive your biometric data.</li>
+            <li>Local app preferences (e.g., notification toggles).</li>
+        </ul>
+
+        <h3>2.7 Subscriptions</h3>
+        <p>Purchases are processed by Apple through the App Store. We receive subscription status from StoreKit to enable app features. We do not receive or store your full payment card details.</p>
+
+        <h2>3. How We Use Information</h2>
+        <ul>
+            <li>Provide account registration, login, and session management.</li>
+            <li>Deliver, sync, and display encrypted messages between you and your friends.</li>
+            <li>Operate friend requests, chat rooms, and real-time presence.</li>
+            <li>Establish encrypted voice calls and deliver VoIP push notifications.</li>
+            <li>Send push notifications you have authorized (messages, friend requests, calls).</li>
+            <li>Manage subscriptions and free trial eligibility.</li>
+            <li>Maintain security, prevent abuse, and improve reliability of the service.</li>
+            <li>Respond to support requests you send to us.</li>
+        </ul>
+
+        <h2>4. Legal Bases (where applicable)</h2>
+        <p>Depending on your region, we process data based on: performance of our contract with you (providing the service), your consent (notifications, microphone, location when you use those features), and legitimate interests (security and fraud prevention).</p>
+
+        <h2>5. Sharing with Third Parties</h2>
+        <ul>
+            <li><strong>Apple</strong> — Sign in with Apple, App Store purchases, Push Notifications, PushKit (VoIP), and CallKit.</li>
+            <li><strong>Cloudflare</strong> — Application backend (Workers, D1 database, WebSocket, and related infrastructure).</li>
+            <li><strong>Cloud storage</strong> — Encrypted attachment blobs (e.g., Cloudflare R2) without decryption keys.</li>
+        </ul>
+        <p>We do not sell your personal information. We do not use your message content for advertising.</p>
+
+        <h2>6. Data Retention</h2>
+        <ul>
+            <li>Account and profile data are retained while your account is active.</li>
+            <li>Encrypted messages are retained until deleted by users or account deletion.</li>
+            <li>Self-destruct messages are designed to expire after the timer you set once read.</li>
+            <li>Voice call streams are not retained after the call ends.</li>
+            <li>When you delete your account, we delete associated profile, messages, friendships, and notification records as described in the app.</li>
+        </ul>
+
+        <h2>7. Security</h2>
+        <p>We use TLS for network transport, server-side password hashing, JWT session tokens, and client-side AES-256-GCM encryption. Keys are stored in the iOS Keychain with device-only accessibility where supported. No security method is perfect; you are responsible for keeping your device and credentials secure.</p>
+
+        <h2>8. Your Rights and Choices</h2>
+        <ul>
+            <li><strong>Access and update:</strong> Edit your profile in the Profile tab.</li>
+            <li><strong>Delete account:</strong> Profile → Delete Account (permanent; removes messages and friends).</li>
+            <li><strong>Notifications:</strong> Toggle in-app under Notification Settings or revoke in iOS Settings → WhishperLock → Notifications.</li>
+            <li><strong>Microphone / Location / Face ID:</strong> Manage in iOS Settings → WhishperLock.</li>
+            <li><strong>Subscriptions:</strong> Manage or cancel in iOS Settings → Apple ID → Subscriptions.</li>
+        </ul>
+        <p>Depending on your jurisdiction, you may have additional rights (access, portability, erasure, objection). Contact us at <a href="mailto:aaronyang470128@hotmail.com">aaronyang470128@hotmail.com</a>.</p>
+
+        <h2>9. Children’s Privacy</h2>
+        <p>WhishperLock is not directed to children under 13 (or the minimum age in your country). We do not knowingly collect personal information from children. If you believe a child has provided us data, contact us and we will delete it.</p>
+
+        <h2>10. International Transfers</h2>
+        <p>Data may be processed in countries where our infrastructure providers operate. We rely on appropriate safeguards required by applicable law.</p>
+
+        <h2>11. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. The “Last updated” date at the top will change. Continued use of the App after changes constitutes acceptance of the updated policy.</p>
+
+        <h2>12. Contact Us</h2>
+        <p>
+            <strong>Aaron Yang — WhishperLock</strong><br>
+            Email: <a href="mailto:aaronyang470128@hotmail.com">aaronyang470128@hotmail.com</a><br>
+            Support: <a href="support.html">Support page</a>
+        </p>
+    </article>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-of-service.html">Terms of Service</a>
+        <a href="support.html">Support</a>
+        <a href="mailto:aaronyang470128@hotmail.com">Contact</a>
+        <a href="https://github.com/AaronYang47/WhishperLock">GitHub</a>
+    </div>
+    <p>&copy; 2026 WhishperLock. All rights reserved.</p>
+</footer>
+</body>
+</html>
